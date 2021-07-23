@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from .models import table1
 from Pest_Management.models import Pest_table
+from .forms import update_edit_form
 #from .forms import NameForm
 
 
@@ -53,6 +54,33 @@ def form_add(request):
 def delete_data(request, id):
     if request.method == 'POST':
         pi = Pest_table.objects.get(pk=id)
-        print(pi)
         pi.delete()
     return HttpResponseRedirect('/')
+
+def update_data(request, id):
+    pi = Pest_table.objects.get(pk=id)
+    if request.method == 'POST':
+        pi.name = request.POST["name"]
+        pi.pesttype = request.POST["pesttype"]
+        pi.tl = request.POST["tl"]
+        pi.tu = request.POST["tu"]
+        pi.dd = request.POST["dd"]
+
+        da = Pest_table(name=pi.name,pesttype=pi.pesttype,tl=pi.tl,tu=pi.tu,dd=pi.dd)
+        da.save()
+    
+    else:
+        return render(request,'update.html',{'f1':pi})
+    
+    return HttpResponseRedirect('/')
+
+def updatedmethod(request, id):
+    if request.method == 'POST':
+        pi = Pest_table.objects.get(pk=id)
+        fm = update_edit_form(request.POST, instance=pi)
+        fm.save()
+    else:
+        pi = Pest_table.objects.get(pk=id)   
+        fm = update_edit_form(instance=pi) 
+       
+    return render(request, 'update.html',{'f1':fm})    
